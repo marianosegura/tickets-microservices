@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Password } from '../utils';
+import { PasswordManager } from '../utils';
 
 
 // model constructor properties
@@ -20,7 +20,8 @@ interface UserModel extends mongoose.Model<UserDoc> {
 }
 
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema(
+{
   email: {
     type: String,
     required: true
@@ -29,11 +30,22 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   }
+}, 
+{  // schema options
+  toJSON: {  // change json representation
+    transform(doc, ret) {  // ret is short for returned object
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.password;
+      delete ret.__v;
+    }
+  }
 });
+
 
 userSchema.pre('save', async function(done) {
   if (this.isModified('password')) {  // saving
-    const hashed = await Password.toHash(this.get('password'));
+    const hashed = await PasswordManager.toHash(this.get('password'));
     this.set('password', hashed);
   }
   done();  // we have to call done manually 

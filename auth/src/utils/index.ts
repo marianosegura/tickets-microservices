@@ -1,6 +1,6 @@
-import { Password } from './password';
+import { PasswordManager } from './password-manager';
 
 
 export {
-  Password
+  PasswordManager
 }
