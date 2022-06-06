@@ -1,34 +1,6 @@
-import express from 'express';
-import 'express-async-errors';  // to throw custom errors in async functions
-import { json } from 'body-parser';
 import mongoose from 'mongoose';
-import cookieSession from 'cookie-session';
+import { app } from './app';
 
-import { currentUserRouter, signinRouter, signoutRouter, signupRouter } from './routes';
-import { errorHandler } from './middlewares';
-import { NotFoundError  } from './errors';
-
-
-const app = express();
-app.set('trust proxy', true);  // trust kubernetes ingress-nginx proxied traffic
-app.use(json());
-app.use(cookieSession({
-  signed: false,  // don't ecnrypt our jwt
-  secure: true,  // https exclusive
-}));
-
-
-// routes
-app.use(currentUserRouter);
-app.use(signinRouter);
-app.use(signupRouter);
-app.use(signoutRouter);
-
-app.get('*', async () => {
-  throw new NotFoundError();
-});
-
-app.use(errorHandler);  // custom error handler
 
 const start = async () => {  // create auth db (specified after port)
   if (!process.env.JWT_KEY) {

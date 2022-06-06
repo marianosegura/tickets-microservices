@@ -1,0 +1,26 @@
+import request from 'supertest';
+import { app } from '../../app';
+
+
+it('responds with details about the current user', async () => {
+  const cookie = await global.getCookie();  // global function declared in setup.ts
+  const response = await request(app)
+    .get('/api/users/currentuser')
+    .set('Cookie', cookie)  // attach cookie
+    .send()
+    .expect(200);
+  
+  expect(response.body.currentUser.email).toEqual('test@test.com');  // email used for getCookie
+});
+
+
+it('responds with null if not authenticated', async () => {
+  const response = await request(app)
+    .get('/api/users/currentuser')
+    .send()
+    .expect(200);
+  
+  expect(response.body.currentUser).toEqual(null); 
+});
+
+
