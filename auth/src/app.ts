@@ -11,7 +11,7 @@ const app = express();
 app.set('trust proxy', true);  // trust kubernetes ingress-nginx proxied traffic
 app.use(json());
 app.use(cookieSession({
-  signed: false,  // don't ecnrypt our jwt
+  signed: false,  // don't encrypt our jwt
   secure: process.env.NODE_ENV !== 'test',  // allow http for test, https for prod
 }));
 
