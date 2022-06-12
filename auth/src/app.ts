@@ -3,8 +3,7 @@ import 'express-async-errors';  // to throw custom errors in async functions
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
 import { currentUserRouter, signinRouter, signoutRouter, signupRouter } from './routes';
-import { errorHandler } from './middlewares';
-import { NotFoundError  } from './errors';
+import { errorHandler, NotFoundError } from '@lmrstickets/common';
 
 
 const app = express();

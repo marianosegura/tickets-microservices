@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { BadRequestError } from '../errors';
-import { validateRequest } from '../middlewares';
+import { BadRequestError, validateRequest } from '@lmrstickets/common';
 import { User } from '../models';
 import { PasswordManager } from '../utils';
 import jwt from 'jsonwebtoken';
