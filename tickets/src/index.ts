@@ -7,7 +7,7 @@ const start = async () => {  // create auth db (specified after port)
     throw new Error("Environment variable JWT_KEY undefined!")
   }
 
-  if (!process.env.MONGO_URI) {  // refactored to auth-depl.yaml
+  if (!process.env.MONGO_URI) {  // refactored to tickets-depl.yaml
     throw new Error("Environment variable MONGO_URI undefined!")
   }
   
@@ -24,7 +24,7 @@ const start = async () => {  // create auth db (specified after port)
   }
 
   app.listen(3000, () => {
-    console.log('Auth service at port 3000...')
+    console.log('Tickets service at port 3000...')
   });
 }
 start();
