@@ -2,7 +2,8 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { NotAuthorizedError, NotFoundError, requireAuth, validateRequest, currentUser, BadRequestError } from '@lmrstickets/common';
 import { Ticket } from '../models';
-
+import { natsSingleton } from '../nats-singleton';
+import { TicketUpdatedPublisher } from '../events/publishers';
 
 const router = express.Router();
 
@@ -39,6 +40,14 @@ router.put('/api/tickets/:id', requireAuth, currentUser, validators, validateReq
   try {
     await ticket.save();
     console.log(`Updated ticket ${id} successfully`);
+
+    new TicketUpdatedPublisher(natsSingleton.client).publish({
+      id: ticket.id,
+      title: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId
+    });
+
     res.send(ticket);
     
   } catch (error) {

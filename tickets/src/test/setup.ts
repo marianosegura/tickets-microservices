@@ -1,7 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-
+jest.mock('../nats-singleton');
 
 let mongo: any;  // global, to disconnect afterAll
 
@@ -23,6 +23,7 @@ beforeEach(async () => {  // before each test clear the db
   for (const collection of collections) {
     await collection.deleteMany({});
   }
+  jest.clearAllMocks();  // reset nats-singleton mock function
 });
 
 

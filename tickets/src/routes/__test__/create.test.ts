@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
 import { Ticket } from '../../models';
-
+import { natsSingleton } from '../../nats-singleton';
 
 it('has a route handler at /api/tickets for post requests', async () => {
   const res = await request(app)
@@ -81,4 +81,18 @@ it('creates a ticket with valid inputs', async () => {
   
   tickets = await Ticket.find({});  
   expect(tickets.length).toEqual(1);  // check there's a new doc
+});
+
+
+it('publishes a create ticket event', async () => {
+  await request(app)
+    .post('/api/tickets')
+    .set('Cookie', global.getCookie())
+    .send({
+      title: 'concert ticket',
+      price: 20
+    })
+    .expect(201);
+  
+  expect(natsSingleton.client.publish).toHaveBeenCalled();
 });

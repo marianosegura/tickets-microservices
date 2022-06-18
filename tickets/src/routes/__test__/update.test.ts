@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
 import mongoose from 'mongoose';
+import { natsSingleton } from '../../nats-singleton';
 
 
 it('returns a 404 if the provided id does\'nt exists', async () => {
@@ -106,4 +107,27 @@ it('updates the ticket given valid inputs', async () => {
 
   expect(getRes.body.title).toEqual(newTitle);
   expect(getRes.body.price).toEqual(newPrice);
+});
+
+
+it('publishes an update ticket event', async () => {
+  const cookie = global.getCookie();
+  const res = await request(app)  // create
+    .post('/api/tickets')
+    .set('Cookie', cookie)
+    .send({
+      title: 'ticket #1',
+      price: 20
+    });
+    
+  await request(app)  // update
+    .put(`/api/tickets/${res.body.id}`)
+    .set('Cookie', cookie)
+    .send({
+      title: 'ticket #1 updated',
+      price: 100
+    })
+    .expect(200);
+  
+  expect(natsSingleton.client.publish).toHaveBeenCalled();
 });
