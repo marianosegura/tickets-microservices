@@ -1,6 +1,8 @@
 import { NotAuthorizedError, NotFoundError, OrderStatus, requireAuth } from '@lmrstickets/common';
 import express, { Request, Response } from 'express';
+import { OrderCancelledPublisher } from '../events';
 import { Order } from '../models';
+import { natsSingleton } from '../nats-singleton';
 
 
 const router = express.Router();
@@ -26,6 +28,12 @@ router.delete('/api/orders/:orderId', requireAuth, async (req: Request, res: Res
   await order.save();
 
   // publish a cancelled order event
+  new OrderCancelledPublisher(natsSingleton.client).publish({
+    id: order.id,
+    ticket: {
+      id: order.ticket.id
+    }
+  });
 
   res.status(204).send(order);
 });

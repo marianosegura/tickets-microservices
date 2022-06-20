@@ -3,6 +3,8 @@ import { requireAuth, validateRequest, NotFoundError, OrderStatus, BadRequestErr
 import { body } from 'express-validator';
 import mongoose from 'mongoose';
 import { Ticket, Order } from '../models';
+import { OrderCreatedPublisher } from '../events';
+import { natsSingleton } from '../nats-singleton';
 
 
 const router = express.Router();
@@ -47,6 +49,16 @@ router.post('/api/orders', requireAuth, validators, validateRequest, async (req:
   await order.save();
 
   // publish created order event
+  new OrderCreatedPublisher(natsSingleton.client).publish({
+    id: order.id,
+    status: order.status,
+    userId: order.userId,
+    expiresAt: order.expiresAt.toISOString(),  // as UTC date string
+    ticket: {
+      id: ticket.id,
+      price: ticket.price
+    }
+  });
 
   res.status(201).send(order);
 });

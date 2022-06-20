@@ -3,6 +3,7 @@ import { app } from '../../app';
 import mongoose from 'mongoose';
 import { Order, Ticket } from '../../models';
 import { OrderStatus } from '@lmrstickets/common';
+import { natsSingleton } from '../../nats-singleton';
 
 
 it("returns an error if the ticket doesn't exists", async () => {
@@ -54,4 +55,18 @@ it("reserves an available ticket", async () => {
 });
 
 
-it.todo("emits an order created event");
+it("emits an order created event", async () => {
+  const ticket = Ticket.build({
+    title: 'concert',
+    price: 20
+  });
+  await ticket.save();
+  
+  await request(app)
+    .post('/api/orders')
+    .set('Cookie', global.getCookie())
+    .send({ ticketId: ticket.id })
+    .expect(201);
+
+  expect(natsSingleton.client.publish).toHaveBeenCalled();
+});
