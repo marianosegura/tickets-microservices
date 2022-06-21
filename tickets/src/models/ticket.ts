@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 
 // model constructor properties
@@ -13,6 +14,8 @@ interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
   userId: string;
+  orderId?: string;
+  version: number;  // since we use version, and not the built-in __v, we have to declare it
 }
 
 // model properties
@@ -34,6 +37,9 @@ const ticketSchema = new mongoose.Schema(
   userId: {
     type: String,
     required: true
+  },
+  orderId: {  // nullable, if set the ticket is reserved by some order
+    type: String
   }
 }, 
 {  // schema options
@@ -46,9 +52,15 @@ const ticketSchema = new mongoose.Schema(
 });
 
 
+// version config
+ticketSchema.set('versionKey', 'version');  // use version instead of default __v field
+ticketSchema.plugin(updateIfCurrentPlugin);
+
+
 ticketSchema.statics.build = (attrs: TicketAttrs) => {  // attach builder for type checking
   return new Ticket(attrs);
 }
+
 
 const Ticket = mongoose.model<TicketDoc, TicketModel>('Ticket', ticketSchema);
 export { Ticket };

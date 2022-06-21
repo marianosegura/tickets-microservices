@@ -1,10 +1,12 @@
 import request from 'supertest';
 import { app } from '../../app';
 import { Ticket } from '../../models';
+import { randomId } from '@lmrstickets/common';
 
 
 const createTicket = async (i:number=1) => {
   const ticket = Ticket.build({
+    id: randomId(),
     title: `ticket #${i}`,
     price: i
   });

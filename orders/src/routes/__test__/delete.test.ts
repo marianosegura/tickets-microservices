@@ -1,4 +1,4 @@
-import { OrderStatus } from '@lmrstickets/common';
+import { OrderStatus, randomId } from '@lmrstickets/common';
 import request from 'supertest';
 import { app } from '../../app';
 import { Ticket } from '../../models';
@@ -9,6 +9,7 @@ it('updates the status of an order to cancelled', async () => {
   const user = global.getCookie();
 
   const ticket = Ticket.build({
+    id: randomId(),
     title: 'a ticket',
     price: 10
   });
@@ -38,6 +39,7 @@ it('emits a order cancelled event', async () => {
   const user = global.getCookie();
 
   const ticket = Ticket.build({
+    id: randomId(),
     title: 'a ticket',
     price: 10
   });

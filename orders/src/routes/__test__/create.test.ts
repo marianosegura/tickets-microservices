@@ -2,7 +2,7 @@ import request from 'supertest';
 import { app } from '../../app';
 import mongoose from 'mongoose';
 import { Order, Ticket } from '../../models';
-import { OrderStatus } from '@lmrstickets/common';
+import { OrderStatus, randomId } from '@lmrstickets/common';
 import { natsSingleton } from '../../nats-singleton';
 
 
@@ -19,6 +19,7 @@ it("returns an error if the ticket doesn't exists", async () => {
 
 it("returns an error if the ticket is reserved", async () => {
   const ticket = Ticket.build({
+    id: randomId(),
     title: 'concert',
     price: 20
   });
@@ -42,6 +43,7 @@ it("returns an error if the ticket is reserved", async () => {
 
 it("reserves an available ticket", async () => {
   const ticket = Ticket.build({
+    id: randomId(),
     title: 'concert',
     price: 20
   });
@@ -57,6 +59,7 @@ it("reserves an available ticket", async () => {
 
 it("emits an order created event", async () => {
   const ticket = Ticket.build({
+    id: randomId(),
     title: 'concert',
     price: 20
   });

@@ -54,6 +54,7 @@ router.post('/api/orders', requireAuth, validators, validateRequest, async (req:
     status: order.status,
     userId: order.userId,
     expiresAt: order.expiresAt.toISOString(),  // as UTC date string
+    version: order.version,
     ticket: {
       id: ticket.id,
       price: ticket.price

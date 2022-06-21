@@ -32,7 +32,8 @@ router.delete('/api/orders/:orderId', requireAuth, async (req: Request, res: Res
     id: order.id,
     ticket: {
       id: order.ticket.id
-    }
+    },
+    version: order.version
   });
 
   res.status(204).send(order);

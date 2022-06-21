@@ -1,11 +1,12 @@
 import request from 'supertest';
 import { app } from '../../app';
-import mongoose from 'mongoose';
 import { natsSingleton } from '../../nats-singleton';
+import { randomId } from '@lmrstickets/common';
+import { Ticket } from '../../models';
 
 
 it('returns a 404 if the provided id does\'nt exists', async () => {
-  const id = new mongoose.Types.ObjectId().toHexString();  // valid id
+  const id = randomId();  // valid id
   await request(app)
     .put(`/api/tickets/${id}`)
     .set('Cookie', global.getCookie())
@@ -18,7 +19,7 @@ it('returns a 404 if the provided id does\'nt exists', async () => {
 
 
 it('returns a 401 if the user is not authenticated', async () => {
-  const id = new mongoose.Types.ObjectId().toHexString();  // valid id
+  const id = randomId();  // valid id
   await request(app)
     .put(`/api/tickets/${id}`)
     .send({
@@ -130,4 +131,29 @@ it('publishes an update ticket event', async () => {
     .expect(200);
   
   expect(natsSingleton.client.publish).toHaveBeenCalled();
+});
+
+
+it('rejects update if the ticket is reserved', async () => {
+  const cookie = global.getCookie();
+  const res = await request(app)  // create
+    .post('/api/tickets')
+    .set('Cookie', cookie)
+    .send({
+      title: 'ticket #1',
+      price: 20
+    });
+  
+  const ticket = await Ticket.findById(res.body.id);
+  ticket!.set({ orderId: randomId() });
+  await ticket!.save();
+
+  await request(app)  // update
+    .put(`/api/tickets/${res.body.id}`)
+    .set('Cookie', cookie)
+    .send({
+      title: 'ticket #1 updated',
+      price: 100
+    })
+    .expect(400);
 });

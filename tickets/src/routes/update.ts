@@ -5,6 +5,7 @@ import { Ticket } from '../models';
 import { natsSingleton } from '../nats-singleton';
 import { TicketUpdatedPublisher } from '../events/publishers';
 
+
 const router = express.Router();
 
 const validators = [
@@ -33,6 +34,11 @@ router.put('/api/tickets/:id', requireAuth, currentUser, validators, validateReq
     console.log(`Not owner tried to update ticket ${id}!`);
     throw new NotAuthorizedError();
   }
+  
+  if (ticket.orderId) {
+    console.log(`Ticket ${id} is reserved!`);
+    throw new BadRequestError('Ticket is reserved');
+  }
 
   const { title, price } = req.body;
   ticket.set({ title, price });  // update given fields
@@ -45,7 +51,8 @@ router.put('/api/tickets/:id', requireAuth, currentUser, validators, validateReq
       id: ticket.id,
       title: ticket.title,
       price: ticket.price,
-      userId: ticket.userId
+      userId: ticket.userId,
+      version: ticket.version
     });
 
     res.send(ticket);

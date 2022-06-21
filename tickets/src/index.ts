@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsSingleton } from './nats-singleton';
+import { OrderCreatedListener, OrderCancelledListener } from './events';
+
 
 const start = async () => {  // create auth db (specified after port)
   const { JWT_KEY, MONGO_URI, NATS_CLUSTER_ID, NATS_CLIENT_ID, NATS_URL } = process.env;
@@ -42,6 +44,10 @@ const start = async () => {  // create auth db (specified after port)
     console.log("Couldn't connect to NATS!");
     console.log(error);
   }
+
+  // events listeners
+  new OrderCreatedListener(natsSingleton.client).listen();
+  new OrderCancelledListener(natsSingleton.client).listen();
 
   app.listen(3000, () => {
     console.log('Tickets service at port 3000...')
