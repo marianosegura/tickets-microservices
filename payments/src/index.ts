@@ -1,24 +1,23 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsSingleton } from './nats-singleton';
-import { TicketCreatedListener, TicketUpdatedListener, ExpirationCompleteListener, PaymentCreatedListener } from './events';
+import { OrderCreatedListener, OrderCancelledListener } from './events';
 
 
 const start = async () => {  // create auth db (specified after port)
-  // environment variables verification
-  const { JWT_KEY, MONGO_URI, NATS_CLUSTER_ID, NATS_CLIENT_ID, NATS_URL } = process.env;
+  const { JWT_KEY, MONGO_URI, NATS_CLUSTER_ID, NATS_CLIENT_ID, NATS_URL, STRIPE_KEY } = process.env;
   const envVars = [
     { name: 'JWT_KEY', value: JWT_KEY }, 
     { name: 'MONGO_URI', value: MONGO_URI }, 
     { name: 'NATS_CLUSTER_ID', value: NATS_CLUSTER_ID }, 
     { name: 'NATS_CLIENT_ID', value: NATS_CLIENT_ID }, 
     { name: 'NATS_URL', value: NATS_URL }, 
+    { name: 'STRIPE_KEY', value: STRIPE_KEY }, 
   ];
   envVars.forEach(({ name, value }) => {
     if (!value) throw new Error(`Environment variable ${name} undefined!`);
   });
   
-  // mongo connection
   try {
     await mongoose.connect(MONGO_URI!, {
       useNewUrlParser: true,
@@ -31,7 +30,6 @@ const start = async () => {  // create auth db (specified after port)
     console.log(error);
   }
   
-  // nats connection
   try {
     await natsSingleton.connect(NATS_CLUSTER_ID!, NATS_CLIENT_ID!, NATS_URL!);
     console.log('Connected to NATS');
@@ -48,14 +46,12 @@ const start = async () => {  // create auth db (specified after port)
     console.log(error);
   }
 
-  // event listeners
-  new TicketCreatedListener(natsSingleton.client).listen();
-  new TicketUpdatedListener(natsSingleton.client).listen();
-  new ExpirationCompleteListener(natsSingleton.client).listen();
-  new PaymentCreatedListener(natsSingleton.client).listen();
+  // events listeners
+  new OrderCreatedListener(natsSingleton.client).listen();
+  new OrderCancelledListener(natsSingleton.client).listen();
 
   app.listen(3000, () => {
-    console.log('Orders service at port 3000...')
+    console.log('Payments service at port 3000...')
   });
 }
 start();
