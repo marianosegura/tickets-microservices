@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsSingleton } from './nats-singleton';
-import { TicketCreatedListener, TicketUpdatedListener } from './events';
+import { TicketCreatedListener, TicketUpdatedListener, ExpirationCompleteListener } from './events';
 
 
 const start = async () => {  // create auth db (specified after port)
@@ -51,6 +51,7 @@ const start = async () => {  // create auth db (specified after port)
   // event listeners
   new TicketCreatedListener(natsSingleton.client).listen();
   new TicketUpdatedListener(natsSingleton.client).listen();
+  new ExpirationCompleteListener(natsSingleton.client).listen();
 
   app.listen(3000, () => {
     console.log('Orders service at port 3000...')

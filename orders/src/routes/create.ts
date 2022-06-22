@@ -8,7 +8,7 @@ import { natsSingleton } from '../nats-singleton';
 
 
 const router = express.Router();
-const EXPIRATION_SECONDS = 60 * 15;
+const EXPIRATION_SECONDS = 60 * 0.2;  // 12s
 
 
 const validators = [
