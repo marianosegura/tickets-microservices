@@ -24,7 +24,7 @@ const start = async () => {  // create auth db (specified after port)
   }
 
   app.listen(3000, () => {
-    console.log('Auth service at port 3000...')
+    console.log('Auth service at port 3000....')
   });
 }
 start();
