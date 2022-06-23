@@ -5,10 +5,10 @@ import { useState } from 'react';
 export default ({ url, method, body, onSuccess }) => {
   const [errors, setErrors] = useState(null);
 
-  const doRequest = async () => {
+  const doRequest = async (props={}) => {
     setErrors(null);
     try {
-      const response = await axios[method](url, body);
+      const response = await axios[method](url, {...body, ...props});  // merge optional props
 
       if (onSuccess) {
         onSuccess(response.data);  // success callback
@@ -16,6 +16,7 @@ export default ({ url, method, body, onSuccess }) => {
 
       return response.data;
     } catch (err) {
+      console.log(err);
       setErrors(  // set errors as jsx
         <div className='alert alert-danger'>
           <h4>Ooops...</h4>

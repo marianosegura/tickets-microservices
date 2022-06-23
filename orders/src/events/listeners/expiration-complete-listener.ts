@@ -18,8 +18,8 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
     }
 
     if (order.status === OrderStatus.Complete) {
-      msg.ack();  // order already paid for
-    }
+      return msg.ack();  // order already paid for
+    } 
 
     order.set({ 
       status: OrderStatus.Cancelled

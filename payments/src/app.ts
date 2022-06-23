@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import 'express-async-errors';  // to throw custom errors in async functions
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';

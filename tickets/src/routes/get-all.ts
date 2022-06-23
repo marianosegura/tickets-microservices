@@ -10,7 +10,7 @@ router.get('/api/tickets', async (req: Request, res: Response) => {
   console.log(`\nGetting all tickets...`);
   
   try {
-    const tickets = await Ticket.find({});
+    const tickets = await Ticket.find({ orderId: undefined });  // get just available tickets
     console.log(`Returned all tickets successfully`);
     res.send(tickets);
   } catch (error) {

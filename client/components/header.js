@@ -4,7 +4,11 @@ import Link from 'next/link';  // we have to wrap links in next
 
 function Header({ currentUser }) {
   let links = currentUser ?
-    [ { label: 'Sign Out', href: '/auth/signout' }] 
+    [ 
+      { label: 'Sell Ticket', href: '/tickets/new' },
+      { label: 'My Orders', href: '/orders' },
+      { label: 'Sign Out', href: '/auth/signout' },
+    ] 
     :
     [
       { label: 'Sign Up', href: '/auth/signup' },
@@ -22,7 +26,7 @@ function Header({ currentUser }) {
   return (
     <nav className='navbar navbar-light bg-light'>
       <Link href='/'>
-        <a className='navbar-brand'>GitTix</a>
+        <a className='navbar-brand'>Ticket-Commerce</a>
       </Link>
 
       <div className='d-flex justify-content-end font-weight-bold'>
